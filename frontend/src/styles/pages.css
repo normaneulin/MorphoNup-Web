@@ -72,6 +72,7 @@
   border: 1px solid var(--rule); background: var(--paper); font-family: var(--mono); font-size: 0.95rem; letter-spacing: 0.04em;
   line-height: 1.6; word-break: break-all; }
 .seq-input textarea:focus { border-color: var(--haem); }
+.seq-input textarea:focus-visible { outline: none; }      /* no red focus ring; the violet border shows focus */
 .seq-input textarea[aria-invalid="true"] { border-color: var(--eosin); }
 .seq-status { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: baseline; margin-top: 6px; }
 .seq-status .count { font-size: 0.86rem; color: var(--ink-2); }
@@ -231,6 +232,8 @@
 .scan-line { position: absolute; width: 3px; border-radius: 1.5px; background: var(--scan-core); opacity: 0;
   transition: opacity 0.3s; animation: scan-sweep 0.9s ease-in-out infinite alternate; will-change: transform; }
 .scanner.is-scanning .scan-line { opacity: 1; }
+/* Phones and tablets: no sweeping line in the lens (it did not animate on the author's phone); the strip still scans. */
+@media (max-width: 719px), (hover: none) and (pointer: coarse) { .scan-line { display: none; } }
 .scan-lens { transition: stroke 0.3s, opacity 0.3s; }
 @keyframes scan-sweep { from { transform: translateX(0); } to { transform: translateX(var(--lens)); } }
 .scan-caption { padding: 0 16px 14px; text-align: center; color: #B9B2D6; font-size: 0.92rem; font-weight: 600; }
