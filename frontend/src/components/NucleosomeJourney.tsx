@@ -180,7 +180,7 @@ export function NucleosomeJourney() {
 
           {/* zoom lines: two dashed lines from each part to its close-up (behind everything) */}
           <path d="M152,180 L440,116 M152,272 L440,380" className="j-zoom-line" />
-          <path d="M466,262 L695,80 M466,312 L695,374" className="j-zoom-line" />
+          <path d="M466,262 L695,124 M466,312 L695,374" className="j-zoom-line" />
           <path d="M1305,196 L1480,108 M1305,252 L1480,318" className="j-zoom-line" />
 
           {/* 1. cell: H&E colours, pink cytoplasm and violet nucleus */}
