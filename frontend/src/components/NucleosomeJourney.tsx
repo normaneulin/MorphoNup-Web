@@ -6,7 +6,7 @@ import { nucleosomeGeometry, ribbon, type Pt } from "./ChromatinScanner";
 
 // From a cell to one nucleosome, drawn for this site: an H&E-stained cell (pink cytoplasm, violet nucleus), the
 // nucleus with its chromosomes, one chromosome made of packed chromatin fibre that unwinds into loose fibre,
-// nucleosomes on linker DNA, and one nucleosome seen from above (the MorphoNup logo). Dashed wedges show each zoom.
+// nucleosomes on linker DNA, and one nucleosome seen from above (the MorphoNup logo). Two dashed lines show each zoom.
 // Colours are theme variables; randomness is seeded, so the drawing is the same on every load.
 
 const W = 1600;
@@ -178,12 +178,9 @@ export function NucleosomeJourney() {
             </clipPath>
           </defs>
 
-          {/* zoom wedges (behind everything) */}
-          <path d="M152,180 L440,116 L440,380 L152,272 Z" className="j-zoom" />
+          {/* zoom lines: two dashed lines from each part to its close-up (behind everything) */}
           <path d="M152,180 L440,116 M152,272 L440,380" className="j-zoom-line" />
-          <path d="M466,262 L695,80 L695,374 L466,312 Z" className="j-zoom" />
           <path d="M466,262 L695,80 M466,312 L695,374" className="j-zoom-line" />
-          <path d="M1305,196 L1480,108 L1480,318 L1305,252 Z" className="j-zoom" />
           <path d="M1305,196 L1480,108 M1305,252 L1480,318" className="j-zoom-line" />
 
           {/* 1. cell: H&E colours, pink cytoplasm and violet nucleus */}

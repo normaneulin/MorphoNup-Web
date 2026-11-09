@@ -177,12 +177,13 @@
 .car-track { position: relative; flex: 1; height: calc(var(--car-size) + 16px); }
 .car-item { position: absolute; top: 8px; left: 50%; width: var(--car-size); height: var(--car-size); margin-left: calc(var(--car-size) / -2);
   padding: 0; border: 0; background: none; color: var(--ink);
-  transform: translateX(calc(var(--offset) * var(--car-step))) scale(0.58); opacity: 0.3;
+  opacity: var(--o, 0.3); will-change: transform;           /* transform and --o: SpeciesCarousel layout() */
   transition: transform 0.42s cubic-bezier(.2, .7, .2, 1), opacity 0.42s ease; }
-.car-track.no-anim .car-item { transition: none; }
-.car-item.is-centre { transform: translateX(0) scale(1); opacity: 1; cursor: default; }
-.car-item.is-far { opacity: 0; pointer-events: none; }
-.car-item:not(.is-centre):not(.is-far):hover { opacity: 0.5; }
+.car-track.no-anim .car-item, .car-track[data-dragging] .car-item { transition: none; }
+.car-track[data-dragging] { cursor: grabbing; }
+.car-item.is-centre { cursor: default; }
+.car-item.is-far { pointer-events: none; }
+@media (hover: hover) { .car-item:not(.is-centre):not(.is-far):hover { opacity: max(var(--o), 0.5); } }
 .silhouette { width: 100%; height: 100%; display: block; }
 .car-arrow { position: relative; z-index: 3; flex: none; display: grid; place-items: center; width: 40px; height: 40px;
   border-radius: 50%; border: 1px solid var(--rule); background: var(--slide); color: var(--ink); transition: border-color 0.2s, color 0.2s; }
@@ -224,7 +225,11 @@
 .scan-shade { fill: var(--scan-bg); opacity: 0.55; }
 .scan-lens { fill: none; stroke: var(--scan-dna); stroke-width: 2; opacity: 0.85; }
 .scanner.is-landed .scan-lens { stroke: var(--scan-core); opacity: 1; }
-.scan-line { fill: var(--scan-core); opacity: 0; transition: opacity 0.3s; animation: scan-sweep 0.9s ease-in-out infinite alternate; }
+.scan-view { position: relative; overflow: hidden; }
+.scan-strip { position: absolute; left: 0; top: 0; will-change: transform; }
+.scan-overlay { position: absolute; left: 0; top: 0; pointer-events: none; }
+.scan-line { position: absolute; width: 3px; border-radius: 1.5px; background: var(--scan-core); opacity: 0;
+  transition: opacity 0.3s; animation: scan-sweep 0.9s ease-in-out infinite alternate; will-change: transform; }
 .scanner.is-scanning .scan-line { opacity: 1; }
 .scan-lens { transition: stroke 0.3s, opacity 0.3s; }
 @keyframes scan-sweep { from { transform: translateX(0); } to { transform: translateX(var(--lens)); } }
@@ -275,7 +280,6 @@
 .journey-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .journey-scroll svg { display: block; width: 100%; min-width: 900px; height: auto; }
 .journey figcaption { margin-top: 6px; max-width: 72ch; }
-.j-zoom { fill: var(--frost); opacity: 0.55; }
 .j-zoom-line { fill: none; stroke: var(--ink-2); stroke-width: 1.3; stroke-dasharray: 5 5; }
 .j-cell { fill: var(--eosin-soft); stroke: var(--eosin); stroke-width: 3; }
 .j-organelle { fill: var(--eosin); opacity: 0.35; }

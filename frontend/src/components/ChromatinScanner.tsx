@@ -16,10 +16,16 @@ const ADVANCE = 13;       // shift of the second gyre along the fibre
 const TILT = (-32 * Math.PI) / 180;
 const TURNS = 1.65;
 const VARIANTS = 4;       // four different linkers; the strip repeats every 4 units
-const SPEED = 520;        // px per second while scanning
-const MIN_SCAN_MS = 900;  // scan at least this long, so the motion reads
+const SPEED = 400;        // drawing units per second while scanning (about 1.5 nucleosomes a second on every screen)
+const MIN_SCAN_MS = 1100; // scan at least this long, so the motion reads
 const LENS = 132;
-const UNITS = [-3, 17];   // units drawn (covers scanning, landing and half the panel on each side)
+const UNITS = [-2, 9];    // units drawn: the strip position stays in 0.5 U .. 5 U (+ landing), half a panel each side
+const PERIOD = VARIANTS * U;
+const WRAP_AT = 5 * U;    // past this the position jumps back one period, which looks identical
+const X0 = UNITS[0] * U;
+const STRIP_W = (UNITS[1] - UNITS[0] + 1) * U;
+// On a narrow panel the drawing is scaled down (to 0.66 at 370 px), so a phone shows the same scene as a desktop.
+const scaleFor = (width: number) => Math.min(1, Math.max(0.66, width / 560));
 
 export type Pt = [number, number];
 
@@ -118,10 +124,11 @@ export type ScanPhase = "idle" | "scanning" | "done";
 // (the prediction) is known, then decelerates and lands on that kind of DNA and calls onLanded. "done": it stays there.
 export function ChromatinScanner({ phase, target, onLanded }: { phase: ScanPhase; target: Label | null; onLanded: () => void }) {
   const box = useRef<HTMLDivElement>(null);
-  const strip = useRef<SVGGElement>(null);
+  const strip = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(560);
   const [landed, setLanded] = useState<Label | null>(null);
   const widthRef = useRef(width);
+  const scale = scaleFor(width);
   const phaseRef = useRef(phase);
   const targetRef = useRef(target);
   const landedRef = useRef(onLanded);
@@ -162,7 +169,18 @@ export function ChromatinScanner({ phase, target, onLanded }: { phase: ScanPhase
     const s = anim.current;
     s.last = performance.now();
     let raf = 0;
-    const place = () => strip.current?.setAttribute("transform", `translate(${(widthRef.current / 2 - s.x).toFixed(1)},0)`);
+    // The strip is one HTML layer moved with a CSS transform: the browser slides the drawn picture on the GPU instead
+    // of redrawing every DNA and histone path in each frame (that redraw made the scan stutter on phones).
+    const place = () => {
+      const w = widthRef.current;
+      const px = w / 2 - (s.x - X0) * scaleFor(w);
+      if (strip.current) strip.current.style.transform = `translate3d(${px.toFixed(2)}px,0,0)`;
+    };
+    const wrap = () => {
+      if (s.x <= WRAP_AT) return;
+      s.x -= PERIOD;
+      if (s.landing) { s.landing.x0 -= PERIOD; s.landing.x1 -= PERIOD; }
+    };
     const tick = (now: number) => {
       const dt = Math.min(0.05, (now - s.last) / 1000);
       s.last = now;
@@ -191,13 +209,13 @@ export function ChromatinScanner({ phase, target, onLanded }: { phase: ScanPhase
         s.v += (goal - s.v) * Math.min(1, dt * 3.5);          // smooth start and smooth stop
         if (Math.abs(s.v) < 0.5 && goal === 0) s.v = 0;
         s.x += s.v * dt;
-        if (s.x > 9 * U) s.x -= VARIANTS * U;
         if (scanning && t && now - s.start >= MIN_SCAN_MS && s.v > SPEED * 0.85) {
           const offset = t === "nucleosomal" ? U / 2 : 0;
           const x1 = Math.ceil((s.x + 0.6 * U - offset) / U) * U + offset;   // next centre with room to slow down
           s.landing = { x0: s.x, x1, v0: s.v, t: now, ms: ((2 * (x1 - s.x)) / s.v) * 1000, label: t };
         }
       }
+      wrap();
       place();
       raf = requestAnimationFrame(tick);
     };
@@ -222,20 +240,26 @@ export function ChromatinScanner({ phase, target, onLanded }: { phase: ScanPhase
       </g>,
     );
   }
-  const lensX = width / 2 - LENS / 2;
+  const lens = LENS * scale;
+  const h = H * scale;
+  const lensX = width / 2 - lens / 2;
   const caption = landed
     ? landed === "nucleosomal" ? "Landed on a nucleosome" : "Landed on linker DNA"
     : phase === "scanning" ? "Reading the sequence and its shape" : "Ready";
   return (
     <div className={`scanner is-${landed ? "landed" : phase}`} ref={box}>
-      <svg width={width} height={H} role="img" aria-label={caption}>
-        <g ref={strip}>{units}</g>
-        <rect x={0} y={0} width={Math.max(0, lensX)} height={H} className="scan-shade" />
-        <rect x={lensX + LENS} y={0} width={Math.max(0, width - lensX - LENS)} height={H} className="scan-shade" />
-        <rect x={lensX} y={10} width={LENS} height={H - 20} rx={16} className="scan-lens" />
-        <rect x={lensX} y={14} width={3} height={H - 28} rx={1.5} className="scan-line"
-          style={{ "--lens": `${LENS - 3}px` } as React.CSSProperties} />
-      </svg>
+      <div className="scan-view" style={{ height: h }} role="img" aria-label={caption}>
+        <div className="scan-strip" ref={strip}>
+          <svg width={STRIP_W * scale} height={h} viewBox={`${X0} 0 ${STRIP_W} ${H}`} aria-hidden="true">{units}</svg>
+        </div>
+        <svg className="scan-overlay" width={width} height={h} aria-hidden="true">
+          <rect x={0} y={0} width={Math.max(0, lensX)} height={h} className="scan-shade" />
+          <rect x={lensX + lens} y={0} width={Math.max(0, width - lensX - lens)} height={h} className="scan-shade" />
+          <rect x={lensX} y={10 * scale} width={lens} height={h - 20 * scale} rx={16 * scale} className="scan-lens" />
+        </svg>
+        <div className="scan-line" style={{ left: lensX, top: 14 * scale, height: h - 28 * scale,
+          "--lens": `${lens - 3}px` } as React.CSSProperties} />
+      </div>
       <div className="scan-caption" aria-live="polite">{caption}</div>
       <div className="scan-legend">
         <span>
