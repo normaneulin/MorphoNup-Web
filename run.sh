@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run the MorphoNup website on the lab workstation. Open http://localhost:8000 (VS Code forwards the port over SSH).
+# Build and serve the MorphoNup website locally at http://localhost:8000 (PORT=... to change the port).
 #   bash run.sh            build the page (a few seconds), then serve it
 # The site is static, as on GitHub Pages: the models run in the browser, no Python server is needed. Stop with Ctrl+C.
 set -e

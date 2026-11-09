@@ -72,7 +72,7 @@ export default function Datasets() {
                       {percent(d.benchmark.accuracy)}
                       {d.benchmark.seeds > 1 && d.benchmark.accuracy_sd !== null ? (
                         <span className="muted small"> ± {(d.benchmark.accuracy_sd * 100).toFixed(2)}</span>
-                      ) : null}
+                      ) : d.benchmark.single_run ? <span className="muted small"> (one seed so far)</span> : null}
                     </span>
                     <span role="cell" data-label="MCC">{d.benchmark.mcc.toFixed(3)}</span>
                     <span role="cell" data-label="ROC AUC">{d.benchmark.roc_auc.toFixed(3)}</span>

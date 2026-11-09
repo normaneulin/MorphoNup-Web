@@ -90,7 +90,7 @@ export function Result({ result, dataset }: { result: Prediction; dataset: Datas
               <dt>Accuracy on this dataset</dt>
               <dd>
                 {percent(bench.accuracy)} in {result.model.k}-fold cross-validation (MCC {bench.mcc.toFixed(2)}, ROC AUC{" "}
-                {bench.roc_auc.toFixed(3)}{bench.seeds > 1 ? `, mean of ${bench.seeds} seeds` : ""})
+                {bench.roc_auc.toFixed(3)}{bench.seeds > 1 ? `, mean of ${bench.seeds} seeds` : bench.single_run ? ", one seed so far" : ""})
               </dd>
             </div>
           )}

@@ -18,6 +18,7 @@ export interface Benchmark {
   pr_auc: number;
   seeds: number;
   accuracy_sd: number | null;
+  single_run?: boolean;     // metrics of the one finished run (seed 151000), until the dataset's benchmark row exists
 }
 
 export interface DatasetItem {
@@ -208,7 +209,7 @@ export const api = {
   prepare: async (slug: string) => {
     await datasetItem(slug);
     await Promise.all([
-      sequenceFile(slug).then((data) => { window.setTimeout(() => data.lookup(new Uint8Array(147)), 0); }),   // builds the index
+      sequenceFile(slug),
       engine({ slug }),
     ]);
   },

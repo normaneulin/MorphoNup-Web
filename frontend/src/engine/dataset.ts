@@ -18,7 +18,6 @@ export class DatasetSequences {
   private numbers: Uint32Array;
   private meta: Uint8Array;
   private packed: Uint8Array;
-  private canonIndex: Map<string, number[]> | null = null;
   private joined: string | null = null;
 
   constructor(buffer: ArrayBuffer, n: number) {
@@ -51,12 +50,27 @@ export class DatasetSequences {
     return s;
   }
 
-  /** Dataset rows of a sequence, matched on the strand that comes first alphabetically (as `canon` in the server). */
+  /** Dataset rows equal to the sequence or to its reverse complement (the server matches the same pairs through the
+   *  alphabetically first strand, `canon`), and those equal to the sequence itself. A direct scan of the packed bytes:
+   *  a few milliseconds even for 157,448 sequences, with no index to build. */
   lookup(codes: Uint8Array): { rows: number[]; same: number[] } {
-    const index = this.buildIndex();
-    const rows = index.get(canonKey(codes)) ?? [];
-    const key = packKey(codes);
-    return { rows, same: rows.filter((i) => packKey(this.codes(i)) === key) };
+    const fwd = pack(codes);
+    const rc = pack(reverseComplement(codes));
+    const rows: number[] = [];
+    const same: number[] = [];
+    const data = this.packed;
+    for (let i = 0, base = 0; i < this.n; i++, base += PACKED) {
+      let isFwd = true;
+      let isRc = true;
+      for (let b = 0; b < PACKED && (isFwd || isRc); b++) {
+        const v = data[base + b];
+        if (v !== fwd[b]) isFwd = false;
+        if (v !== rc[b]) isRc = false;
+      }
+      if (isFwd || isRc) rows.push(i);
+      if (isFwd) same.push(i);
+    }
+    return { rows, same };
   }
 
   /** Indices in dataset order matching a label and a search text: a piece of sequence, or words of the name. */
@@ -84,24 +98,27 @@ export class DatasetSequences {
     return out;
   }
 
-  private buildIndex(): Map<string, number[]> {
-    if (this.canonIndex) return this.canonIndex;
-    const index = new Map<string, number[]>();
-    for (let i = 0; i < this.n; i++) {
-      const key = canonKey(this.codes(i));
-      const list = index.get(key);
-      if (list) list.push(i);
-      else index.set(key, [i]);
-    }
-    this.canonIndex = index;
-    return index;
-  }
-
   private joinedSequences(): string {
     if (this.joined === null) {
-      const parts: string[] = [];
-      for (let i = 0; i < this.n; i++) parts.push(this.sequence(i));
-      this.joined = parts.join("|");             // 147 bases + a separator: sequence i starts at 148 i
+      // every packed byte is 4 bases: decode through a 256-entry table into one ASCII buffer, then one string
+      const out = new Uint8Array(this.n * 148);
+      const letters = [65, 67, 71, 84];              // A C G T
+      const table = new Uint8Array(256 * 4);
+      for (let v = 0; v < 256; v++) for (let j = 0; j < 4; j++) table[v * 4 + j] = letters[(v >> (2 * j)) & 3];
+      for (let i = 0; i < this.n; i++) {
+        const src = i * PACKED;
+        const dst = i * 148;
+        for (let b = 0; b < PACKED; b++) {
+          const t = this.packed[src + b] * 4;
+          const at = dst + b * 4;
+          out[at] = table[t];
+          if (b * 4 + 1 < 147) out[at + 1] = table[t + 1];
+          if (b * 4 + 2 < 147) out[at + 2] = table[t + 2];
+          if (b * 4 + 3 < 147) out[at + 3] = table[t + 3];
+        }
+        out[dst + 147] = 124;                         // "|": sequence i starts at 148 i
+      }
+      this.joined = new TextDecoder("latin1").decode(out);
     }
     return this.joined;
   }
@@ -113,22 +130,9 @@ export function reverseComplement(codes: Uint8Array): Uint8Array {
   return rc;
 }
 
-/** A compact string key of a sequence (2 bits per base). */
-function packKey(codes: Uint8Array): string {
-  let s = "";
-  for (let b = 0; b < codes.length; b += 4) {
-    let v = 0;
-    for (let j = 0; j < 4 && b + j < codes.length; j++) v |= codes[b + j] << (2 * j);
-    s += String.fromCharCode(v);
-  }
-  return s;
-}
-
-/** Key of the alphabetically smaller of the sequence and its reverse complement (A < C < G < T = code order). */
-function canonKey(codes: Uint8Array): string {
-  const rc = reverseComplement(codes);
-  for (let i = 0; i < codes.length; i++) {
-    if (codes[i] !== rc[i]) return packKey(codes[i] < rc[i] ? codes : rc);
-  }
-  return packKey(codes);
+/** 2 bits per base, as in sequences.bin (base i in byte i / 4, bits 2 (i % 4)); 147 bases -> 37 bytes. */
+function pack(codes: Uint8Array): Uint8Array {
+  const out = new Uint8Array(PACKED);
+  for (let b = 0; b < codes.length; b++) out[b >> 2] |= codes[b] << (2 * (b & 3));
+  return out;
 }

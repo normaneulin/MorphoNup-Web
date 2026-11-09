@@ -6,7 +6,9 @@ For every dataset whose k = 5, seed 151000 run is finished it writes, under webs
                                mean and SD of its training rows (recomputed exactly as morphonup.preprocess.kmer_views)
   sequences.sqlite             every sequence of every exported dataset: name, sequence, canonical form, label,
                                the fold whose test part contains it, and its saved out-of-fold probabilities
-  manifest.json                what was exported, from which run, with file hashes
+  manifest.json                what was exported, from which run, with file hashes, and the dataset's metrics: the
+                               benchmark table row, or, until the dataset has one, the metrics of this run's saved
+                               out-of-fold predictions (single_run = true)
 
 Usage (from website/, with the training environment's Python):  python scripts/export_bundle.py [--datasets ...]
 """
@@ -75,6 +77,17 @@ def benchmark_row(dataset_id):
     return out
 
 
+def oof_metrics(oof):
+    """Metrics of the saved out-of-fold predictions of this one run (seed 151000), for a dataset that has no row in the
+    benchmark table yet (its refit or its other seeds are still training). Same definitions as the benchmark table."""
+    from sklearn.metrics import accuracy_score, average_precision_score, balanced_accuracy_score, matthews_corrcoef, roc_auc_score
+    y, p = oof["label"].to_numpy(), oof["probability"].to_numpy()
+    pred = (p >= 0.5).astype(int)
+    return dict(accuracy=float(accuracy_score(y, pred)), balanced_accuracy=float(balanced_accuracy_score(y, pred)),
+                mcc=float(matthews_corrcoef(y, pred)), roc_auc=float(roc_auc_score(y, p)),
+                pr_auc=float(average_precision_score(y, p)), seeds=1, accuracy_sd=None, single_run=True)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--datasets", nargs="*", help="dataset ids (default: all finished)")
@@ -129,7 +142,7 @@ def main():
         db.commit()
         manifest["datasets"][dataset_id] = dict(slug=slug(dataset_id), species=species, region=region, k=K, seed=SEED,
                                                 stage=stage, n=len(seqs), positive=int(ds.y.sum()), folds=folds,
-                                                benchmark=benchmark_row(dataset_id))
+                                                benchmark=benchmark_row(dataset_id) or oof_metrics(oof))
         print(f"{dataset_id}: {stage}, {len(seqs)} sequences ({time.time() - t0:.0f} s)", flush=True)
     db.execute("CREATE INDEX IF NOT EXISTS by_canon ON sequences (dataset, canon)")
     db.execute("CREATE INDEX IF NOT EXISTS by_label ON sequences (dataset, label, idx)")
