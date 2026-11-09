@@ -65,10 +65,12 @@ button { cursor: pointer; }
 .small { font-size: 0.86rem; }
 .mono { font-family: var(--mono); }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-/* "Reduce motion": decorative animations and transitions are removed. Two motions stay, calmer: the chromatin scanner
-   (slower, in ChromatinScanner.tsx) and the species carousel, which slides briefly so a change of species can be followed. */
+/* "Reduce motion": decorative animations and transitions are removed. Three motions stay, calmer: the chromatin scanner
+   (slower, in ChromatinScanner.tsx) with the sweep of its lens, and the species carousel, which slides briefly so a
+   change of species can be followed. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
+  .scanner.is-scanning .scan-line { animation: scan-sweep 1.3s ease-in-out infinite alternate !important; }
   .car-item { transition: transform 0.25s ease-out, opacity 0.25s ease-out !important; }
   .car-track.no-anim .car-item, .car-track[data-dragging] .car-item { transition: none !important; }
 }
