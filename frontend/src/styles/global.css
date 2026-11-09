@@ -1,0 +1,112 @@
+/* MorphoNup design tokens and base styles. Palette: the H&E stain (haematoxylin violet, eosin pink) on the pale glass
+   of a microscope slide. Dark theme: its own steps, not an inversion. Type: Atkinson Hyperlegible Next and Mono. */
+:root {
+  --ink: #241C47;
+  --ink-2: #5D5870;          /* secondary text */
+  --haem: #4B3D8F;           /* actions, "nucleosomal" */
+  --haem-strong: #3A2E75;
+  --haem-soft: #DCD6F2;
+  --on-haem: #FFFFFF;
+  --eosin: #D9577F;          /* focus ring, dyad */
+  --eosin-soft: #FBE4EC;
+  --teal: #1F7F86;           /* "linker" */
+  --teal-soft: #D6ECEC;
+  --slide: #FAF8FC;          /* page */
+  --paper: #FFFFFF;          /* panels */
+  --frost: #EEEAF4;          /* quiet fills, the frosted end of a slide */
+  --rule: #DAD5E6;
+  --base-a: #1E8A57; --base-c: #2462B3; --base-g: #B07800; --base-t: #C2362C;
+  --sans: "Atkinson Hyperlegible Next", system-ui, sans-serif;
+  --mono: "Atkinson Hyperlegible Mono", ui-monospace, Menlo, monospace;
+  --radius-s: 6px;
+  --radius-m: 12px;
+  --radius-l: 18px;
+  --gutter: 16px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #EEEAF9;
+    --ink-2: #B9B2D6;
+    --haem: #A99BF0;
+    --haem-strong: #C4B9F8;
+    --haem-soft: #3A3170;
+    --on-haem: #17122E;
+    --eosin: #E27596;
+    --eosin-soft: #46213A;
+    --teal: #5CC3C9;
+    --teal-soft: #173F45;
+    --slide: #17122E;
+    --paper: #211B3F;
+    --frost: #2A2350;
+    --rule: #3A3266;
+    --base-a: #4CC48A; --base-c: #78A9F0; --base-g: #E2B445; --base-t: #F07A6E;
+    color-scheme: dark;
+  }
+}
+@media (min-width: 720px) { :root { --gutter: 32px; } }
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--slide); color: var(--ink);
+  font-family: var(--sans); font-size: 17px; line-height: 1.55; font-variant-numeric: tabular-nums;
+}
+h1, h2, h3 { margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(2.2rem, 5.6vw, 3.7rem); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 1.45rem; font-weight: 700; letter-spacing: -0.01em; }
+h3 { font-size: 1.05rem; font-weight: 700; }
+p { margin: 0.5rem 0 0; max-width: 68ch; }
+a { color: var(--haem); }
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--eosin); outline-offset: 2px; }
+.muted { color: var(--ink-2); }
+.small { font-size: 0.86rem; }
+.mono { font-family: var(--mono); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* light/dark logo swap */
+.only-dark { display: none; }
+@media (prefers-color-scheme: dark) { .only-dark { display: inline-block; } .only-light { display: none; } }
+
+/* layout */
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 var(--gutter); }
+main { padding-bottom: 96px; }
+
+/* header */
+.site-header { border-bottom: 1px solid var(--rule); background: var(--slide); }
+.site-header .wrap { display: flex; align-items: center; gap: 20px; min-height: 64px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font-weight: 800;
+  font-size: 1.25rem; letter-spacing: -0.02em; }
+.brand img { width: 36px; height: 36px; }
+.nav { display: flex; gap: 4px; margin-left: auto; }
+.nav a { text-decoration: none; color: var(--ink-2); padding: 8px 12px; border-radius: var(--radius-s); font-weight: 600; }
+.nav a:hover { color: var(--ink); background: var(--frost); }
+.nav a.active { color: var(--ink); box-shadow: inset 0 -3px 0 var(--haem); border-radius: 0; }
+@media (max-width: 480px) { .brand span { display: none; } .nav a { padding: 8px 10px; } }
+
+/* buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: var(--radius-m);
+  padding: 12px 20px; font-weight: 700; text-decoration: none; background: var(--haem); color: var(--on-haem); }
+.btn:hover { background: var(--haem-strong); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-quiet { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--rule); background: var(--paper);
+  color: var(--ink); border-radius: var(--radius-s); padding: 7px 12px; font-weight: 600; font-size: 0.92rem; }
+.btn-quiet:hover { border-color: var(--haem); }
+.btn-quiet[aria-pressed="true"] { border-color: var(--haem); background: var(--haem-soft); }
+
+/* chips for labels */
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 700; padding: 2px 9px;
+  border-radius: 999px; white-space: nowrap; }
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.chip.nucleosomal { color: var(--haem); background: var(--haem-soft); }
+.chip.linker { color: var(--teal); background: var(--teal-soft); }
+.chip.waiting { color: var(--ink-2); background: var(--frost); }
+.chip.waiting::before { display: none; }
+
+/* footer */
+.site-footer { border-top: 1px solid var(--rule); padding: 28px 0 40px; color: var(--ink-2); font-size: 0.9rem; }
+.site-footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+.site-footer a + a { margin-left: 18px; }

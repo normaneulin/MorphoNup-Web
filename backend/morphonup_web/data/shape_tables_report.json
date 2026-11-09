@@ -1,0 +1,106 @@
+{
+ "datasets": [
+  {
+   "id": "DatasetNup_1/Caenorhabditis_elegans",
+   "sequences": 5175,
+   "excluded": 0,
+   "fasta_sha256": "a7d1ce7f0f1dc4bc3cfcbe7d1bba278f98a3ecae0ec1cf43b7169bc8475e773c"
+  },
+  {
+   "id": "DatasetNup_1/Drosophila_melanogaster",
+   "sequences": 5750,
+   "excluded": 0,
+   "fasta_sha256": "40e76b613a86d24580ae8b926d4c265d807f66ea068083d56c7698924ab34fac"
+  },
+  {
+   "id": "DatasetNup_1/Homo_sapiens",
+   "sequences": 4573,
+   "excluded": 0,
+   "fasta_sha256": "17677473591f4fdfa2c5acfa6e41f4be03c12c7939854903fa08068138b6671a"
+  },
+  {
+   "id": "DatasetNup_2/Drosophila_melanogaster/5U",
+   "sequences": 7373,
+   "excluded": 0,
+   "fasta_sha256": "2679d01ea25c4c9d62f180008e4e2c75ddac6b77dd04aaa49633a1cd8c862b0c"
+  },
+  {
+   "id": "DatasetNup_2/Drosophila_melanogaster/LC",
+   "sequences": 76512,
+   "excluded": 0,
+   "fasta_sha256": "e1166a41d4f961486277a4a6cee4e8068ef124c04873e9b563d74525a48c56a3"
+  },
+  {
+   "id": "DatasetNup_2/Drosophila_melanogaster/PM",
+   "sequences": 77013,
+   "excluded": 1,
+   "fasta_sha256": "073e4b80993fe9720a6f30d738e67c4fb27dc6a438f3ae3b78c78540f3eec219"
+  },
+  {
+   "id": "DatasetNup_2/Homo_sapiens/5U",
+   "sequences": 16649,
+   "excluded": 0,
+   "fasta_sha256": "c21e84ea90e5da676ae2a2ecbd1377c472a916759c799e2094770fa5696733d1"
+  },
+  {
+   "id": "DatasetNup_2/Homo_sapiens/LC",
+   "sequences": 157448,
+   "excluded": 5324,
+   "fasta_sha256": "0b216fc8b04bd3d2fedeac7a2c2b7890e80f379b7024951825426a7ac153c4ab"
+  },
+  {
+   "id": "DatasetNup_2/Homo_sapiens/PM",
+   "sequences": 100844,
+   "excluded": 199,
+   "fasta_sha256": "6ae9149b563ba7b923c72fe0dff0fe323af7738eb010527d92cc6266c26e9b83"
+  },
+  {
+   "id": "DatasetNup_2/Saccharomyces_cerevisiae/PM",
+   "sequences": 31836,
+   "excluded": 0,
+   "fasta_sha256": "2f9a32c980cfba3b259597d69b483041bc2b55456f1494bd7e3ab2887e072903"
+  },
+  {
+   "id": "DatasetNup_2/Saccharomyces_cerevisiae/WG",
+   "sequences": 44485,
+   "excluded": 0,
+   "fasta_sha256": "13aa260a490d32b66e8381909966b5e9c51c23312ed743f5de150fa1959234b1"
+  },
+  {
+   "id": "DatasetNup_3",
+   "sequences": 6271,
+   "excluded": 0,
+   "fasta_sha256": "b039e68005c6edb77b8f417341ef00732f9124a004173976f4bc9df074dae38a"
+  }
+ ],
+ "coverage": {
+  "Buckle.pentamer": "1024/1024",
+  "EP.pentamer": "1024/1024",
+  "MGW.pentamer": "1024/1024",
+  "Opening.pentamer": "1024/1024",
+  "ProT.pentamer": "1024/1024",
+  "Shear.pentamer": "1024/1024",
+  "Stagger.pentamer": "1024/1024",
+  "Stretch.pentamer": "1024/1024",
+  "HelT.hexamer": "4096/4096",
+  "HelT.left": "1024/1024",
+  "HelT.right": "1024/1024",
+  "Rise.hexamer": "4096/4096",
+  "Rise.left": "1024/1024",
+  "Rise.right": "1024/1024",
+  "Roll.hexamer": "4096/4096",
+  "Roll.left": "1024/1024",
+  "Roll.right": "1024/1024",
+  "Shift.hexamer": "4096/4096",
+  "Shift.left": "1024/1024",
+  "Shift.right": "1024/1024",
+  "Slide.hexamer": "4096/4096",
+  "Slide.left": "1024/1024",
+  "Slide.right": "1024/1024",
+  "Tilt.hexamer": "4096/4096",
+  "Tilt.left": "1024/1024",
+  "Tilt.right": "1024/1024"
+ },
+ "conflicts": {},
+ "seconds": 112.3
+}

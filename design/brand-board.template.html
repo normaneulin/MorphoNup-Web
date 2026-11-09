@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MorphoNup brand board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;600&family=Atkinson+Hyperlegible+Next:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #241C47;          /* haematoxylin, deep */
+  --haem: #4B3D8F;         /* haematoxylin */
+  --haem-soft: #DCD6F2;
+  --eosin: #D9577F;        /* eosin */
+  --eosin-soft: #FBE4EC;
+  --slide: #FAF8FC;        /* glass slide */
+  --frost: #EEEAF4;        /* frosted label end of a slide */
+  --graphite: #5D5870;
+  --rule: #DAD5E6;
+  --night: #17122E;
+  --night-ink: #EEEAF9;
+  --sans: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
+  --mono: "Atkinson Hyperlegible Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--slide); color: var(--ink);
+  font-family: var(--sans); font-size: 17px; line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+}
+main { max-width: 1120px; margin: 0 auto; padding: 40px 16px 80px; }
+@media (min-width: 720px) { main { padding: 64px 32px 96px; } }
+h1, h2, h3 { line-height: 1.15; margin: 0; }
+h1 { font-size: clamp(2.2rem, 6vw, 3.6rem); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 0.4rem; }
+h3 { font-size: 1.1rem; font-weight: 700; }
+p { margin: 0.5rem 0 0; max-width: 68ch; }
+.muted { color: var(--graphite); }
+section { margin-top: 72px; }
+a { color: var(--haem); }
+:focus-visible { outline: 3px solid var(--eosin); outline-offset: 2px; }
+
+/* header */
+.masthead { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
+.masthead svg { width: 96px; height: 96px; flex: none; }
+.masthead .sub { color: var(--graphite); margin-top: 6px; }
+
+/* logo concepts */
+.concepts { display: grid; gap: 28px; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); margin-top: 24px; }
+.concept { border-top: 3px solid var(--ink); padding-top: 14px; }
+.concept .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+.tile { aspect-ratio: 1; border-radius: 14px; display: grid; place-items: center; padding: 14%; background: #fff; border: 1px solid var(--rule); }
+.tile.dark { background: var(--night); border-color: var(--night); }
+.tile svg { width: 100%; height: 100%; }
+.sizes { display: flex; align-items: end; gap: 14px; margin-top: 10px; }
+.sizes svg { display: block; }
+.sizes span { font-size: 0.8rem; color: var(--graphite); }
+
+/* lockups */
+.lockups { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-top: 20px; }
+.lockup { display: flex; align-items: center; gap: 14px; padding: 28px 24px; border-radius: 14px; background: #fff; border: 1px solid var(--rule); }
+.lockup.dark { background: var(--night); color: var(--night-ink); border-color: var(--night); }
+.lockup svg { width: 64px; height: 64px; flex: none; }
+.wordmark { font-weight: 800; font-size: 2.1rem; letter-spacing: -0.025em; }
+.lockup.stacked { flex-direction: column; text-align: center; }
+.lockup .tag { font-size: 0.95rem; color: var(--graphite); margin-top: 2px; }
+.lockup.dark .tag { color: #B9B2D6; }
+
+/* colour */
+.swatches { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin-top: 20px; }
+.swatch .chip { height: 84px; border-radius: 12px; border: 1px solid rgba(36, 28, 71, 0.12); }
+.swatch b { display: block; margin-top: 8px; }
+.swatch span { display: block; font-size: 0.88rem; color: var(--graphite); }
+.bases { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.base { width: 64px; text-align: center; }
+.base .letter { font-family: var(--mono); font-weight: 600; font-size: 2rem; line-height: 1.4; }
+.base span { font-size: 0.8rem; color: var(--graphite); display: block; }
+.diverge { margin-top: 18px; height: 22px; border-radius: 11px; max-width: 520px;
+  background: linear-gradient(90deg, #1F7F86 0%, #9FCFD1 30%, #E4E1EA 50%, #B9AEE6 70%, #4B3D8F 100%); }
+.diverge-labels { display: flex; justify-content: space-between; max-width: 520px; font-size: 0.85rem; color: var(--graphite); margin-top: 4px; }
+
+/* type */
+.type { display: grid; gap: 28px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-top: 20px; }
+.specimen { border-top: 3px solid var(--ink); padding-top: 14px; }
+.specimen .big { font-size: 3.2rem; font-weight: 700; line-height: 1.05; letter-spacing: -0.02em; margin: 10px 0; }
+.specimen .mono { font-family: var(--mono); font-size: 1.15rem; letter-spacing: 0.06em; word-break: break-all; margin: 12px 0; }
+.scale div { display: flex; gap: 16px; align-items: baseline; border-bottom: 1px solid var(--rule); padding: 6px 0; }
+.scale span:first-child { width: 64px; flex: none; font-size: 0.8rem; color: var(--graphite); }
+
+/* datasets as slides */
+.species { margin-top: 26px; }
+.species-head { display: flex; align-items: center; gap: 10px; color: var(--haem); }
+.species-head h3 { color: var(--ink); }
+.species-head em { font-style: italic; }
+.slides { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); margin-top: 10px; }
+.slide { display: flex; align-items: stretch; min-height: 78px; border: 1px solid var(--rule); border-radius: 6px; background: #fff; overflow: hidden; }
+.slide .frost { width: 64px; flex: none; background: var(--frost); display: grid; place-items: center; color: var(--haem); border-right: 1px solid var(--rule); }
+.slide .glass { padding: 10px 14px; display: flex; flex-direction: column; justify-content: center; }
+.slide .glass b { font-size: 1rem; }
+.slide .glass span { font-size: 0.85rem; color: var(--graphite); }
+
+/* result card */
+.result { margin-top: 22px; display: grid; gap: 28px; grid-template-columns: 1fr; align-items: start; }
+@media (min-width: 900px) { .result { grid-template-columns: 5fr 6fr; } }
+.verdict { padding: 24px; border-radius: 18px; background: #fff; border: 1px solid var(--rule); }
+.verdict .word { font-size: 2.4rem; font-weight: 800; letter-spacing: -0.02em; color: var(--haem); line-height: 1.1; }
+.bar { position: relative; height: 14px; border-radius: 7px; background: var(--frost); margin: 22px 0 6px; }
+.bar .fill { position: absolute; inset: 0 auto 0 0; border-radius: 7px; background: var(--haem); }
+.bar .cut { position: absolute; left: 50%; top: -6px; bottom: -6px; width: 2px; background: var(--ink); }
+.bar-labels { display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--graphite); }
+.strands { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
+.strands div { background: var(--slide); border-radius: 10px; padding: 10px 12px; }
+.strands b { font-size: 1.3rem; display: block; }
+.strands span { font-size: 0.82rem; color: var(--graphite); }
+.truth { margin-top: 16px; font-size: 0.92rem; color: var(--graphite); }
+.seqgrid { font-family: var(--mono); font-size: 15px; line-height: 1.9; }
+.seqrow { display: flex; align-items: baseline; white-space: nowrap; }
+.seqrow .pos { width: 34px; flex: none; text-align: right; padding-right: 10px; font-family: var(--sans); font-size: 0.72rem; color: var(--graphite); }
+.seqrow span:not(.pos) { width: 1.05em; text-align: center; font-weight: 600; }
+.seqrow .dyad { background: var(--eosin-soft); border-radius: 4px; box-shadow: inset 0 -3px 0 var(--eosin); }
+@media (max-width: 380px) { .seqgrid { font-size: 13px; } }
+
+/* voice */
+.voice { display: grid; gap: 0; margin-top: 16px; max-width: 760px; }
+.voice > div { display: grid; grid-template-columns: 140px 1fr; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.voice > div > span:first-child { color: var(--graphite); font-size: 0.9rem; }
+@media (max-width: 560px) { .voice > div { grid-template-columns: 1fr; gap: 2px; } }
+.btn { display: inline-block; background: var(--haem); color: #fff; font-weight: 700; padding: 10px 18px; border-radius: 10px; font-size: 1rem; }
+footer { margin-top: 80px; font-size: 0.85rem; color: var(--graphite); max-width: 760px; }
+</style>
+</head>
+<body>
+<main>
+
+<header class="masthead">
+  {{LOGO}}
+  <div>
+    <h1>MorphoNup</h1>
+    <div class="sub">Brand board for MorphoNup-Web. Logo final, 8 November 2026.</div>
+  </div>
+</header>
+
+<section>
+  <h2>The idea</h2>
+  <p><b>Chromatin</b> means "coloured material". Walther Flemming named it around 1880 because it takes up dyes so
+  strongly. In the most common tissue stain, haematoxylin and eosin (H&amp;E), chromatin turns deep blue-violet while
+  the rest of the cell turns pink. The palette comes from that stain, on the pale glass of a microscope slide.</p>
+  <p>The logo is a nucleosome seen from above. The histone core is split into four pieces, the four histone pairs you
+  see from the top, and the gap between them is an M. The core is eosin pink because eosin stains proteins, and the
+  DNA is haematoxylin violet because haematoxylin stains DNA. The DNA ribbon wraps the core 1.65 turns, like the
+  147&nbsp;bp of a real nucleosome, and it is as wide as the minor groove of a real nucleosomal sequence from the
+  benchmark ({{SEQ_NAME}}, <i>H.&nbsp;sapiens</i>), computed by DNAshapeR. The light dot marks the dyad, the centre of
+  the 147&nbsp;bp.</p>
+</section>
+
+<section>
+  <h2>Logo</h2>
+  <div class="concepts">
+    <div class="concept">
+      <div class="tiles"><div class="tile">{{LOGO}}</div><div class="tile dark">{{LOGO_DARK}}</div></div>
+      <div class="sizes"><span>64</span><svg width="64" height="64" viewBox="0 0 200 200">{{LOGO}}</svg><span>32</span><svg width="32" height="32" viewBox="0 0 200 200">{{LOGO}}</svg><span>16</span><svg width="16" height="16" viewBox="0 0 200 200">{{LOGO}}</svg></div>
+    </div>
+    <div class="concept">
+      <h3>How it is made</h3>
+      <p>The four histone pieces are the author's own drawing (design/logo/histone-core.svg), used as drawn. The DNA
+      ribbon is computed from the groove width of a real sequence by scripts/make_brand_assets.py, so the same script
+      makes the logo, the favicon of the site and this board.</p>
+      <p>On the dark theme the core turns a lighter eosin and the DNA turns pale lilac, so the mark keeps the same
+      contrast instead of being inverted.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Name and lockups</h2>
+  <p class="muted">The wordmark is set in one weight; the capital N already marks where "Nup"
+  (nucleosome positioning) starts, so no second colour is needed.</p>
+  <div class="lockups">
+    <div class="lockup">{{LOGO}}<div><div class="wordmark">MorphoNup</div><div class="tag">Nucleosome positioning from DNA sequence and shape</div></div></div>
+    <div class="lockup dark">{{LOGO_DARK}}<div><div class="wordmark">MorphoNup</div><div class="tag">Nucleosome positioning from DNA sequence and shape</div></div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Colour</h2>
+  <div class="swatches">
+    <div class="swatch"><div class="chip" style="background:#241C47"></div><b>Haematoxylin, deep</b><span>#241C47. Text, logo ribbon</span></div>
+    <div class="swatch"><div class="chip" style="background:#4B3D8F"></div><b>Haematoxylin</b><span>#4B3D8F. Buttons, links, "nucleosomal"</span></div>
+    <div class="swatch"><div class="chip" style="background:#D9577F"></div><b>Eosin</b><span>#D9577F. The histone core of the logo and keyboard focus, used sparingly</span></div>
+    <div class="swatch"><div class="chip" style="background:#FAF8FC"></div><b>Glass slide</b><span>#FAF8FC. Page background</span></div>
+    <div class="swatch"><div class="chip" style="background:#EEEAF4"></div><b>Frosted glass</b><span>#EEEAF4. Panels, the label end of a slide</span></div>
+    <div class="swatch"><div class="chip" style="background:#17122E"></div><b>Night</b><span>#17122E. Dark theme background</span></div>
+  </div>
+  <h3 style="margin-top:28px">Bases</h3>
+  <p class="muted">The usual sequence-logo colours, so researchers read them at a glance. Always shown with the
+  letter, never colour alone.</p>
+  <div class="bases">
+    <div class="base"><div class="letter" style="color:#1E8A57">A</div><span>#1E8A57</span></div>
+    <div class="base"><div class="letter" style="color:#2462B3">C</div><span>#2462B3</span></div>
+    <div class="base"><div class="letter" style="color:#B07800">G</div><span>#B07800</span></div>
+    <div class="base"><div class="letter" style="color:#C2362C">T</div><span>#C2362C</span></div>
+  </div>
+  <h3 style="margin-top:28px">Attribution scale (draft)</h3>
+  <p class="muted">For "which positions pushed the prediction which way": teal toward linker, grey for no effect,
+  haematoxylin toward nucleosomal. To be checked with a colour-blindness validator before use.</p>
+  <div class="diverge" role="img" aria-label="Diverging scale from teal through grey to haematoxylin violet"></div>
+  <div class="diverge-labels"><span>toward linker</span><span>no effect</span><span>toward nucleosomal</span></div>
+</section>
+
+<section>
+  <h2>Type</h2>
+  <div class="type">
+    <div class="specimen">
+      <h3>Atkinson Hyperlegible Next</h3>
+      <div class="big">Does this DNA wrap around a histone?</div>
+      <p>Made by the Braille Institute so that letters that look alike in most fonts (I, l, 1 or O, 0) are easy to
+      tell apart. One family for headings and text, with weight doing the work.</p>
+    </div>
+    <div class="specimen">
+      <h3>Atkinson Hyperlegible Mono</h3>
+      <div class="mono">TGGAATGGAATTGAATGCTATACACTGGAATG</div>
+      <p>For DNA only. A 147-letter sequence has to line up in columns, and C and G must never be confused, which
+      is exactly what this face was drawn for.</p>
+      <div class="scale">
+        <div><span>Display</span><span style="font-size:2.4rem;font-weight:800">Aa</span></div>
+        <div><span>Heading</span><span style="font-size:1.6rem;font-weight:700">Aa</span></div>
+        <div><span>Body 17</span><span>Aa Bb Cc 0123456789</span></div>
+        <div><span>Small</span><span style="font-size:0.85rem">Aa Bb Cc 0123456789</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Species and datasets</h2>
+  <p class="muted">Pick a species first, then a dataset. Each dataset is shown as a microscope slide: the frosted
+  end carries the icon of what part of the genome the sequences come from. Icons are first drafts.</p>
+
+  <div class="species">
+    <div class="species-head">{{ICON_HOMO_SAPIENS}}<h3><em>Homo sapiens</em>, human</h3></div>
+    <div class="slides">
+      <div class="slide"><div class="frost">{{ICON_BALANCED_BENCHMARK}}</div><div class="glass"><b>Benchmark</b><span>DatasetNup 1, balanced</span></div></div>
+      <div class="slide"><div class="frost">{{ICON_GENOME_WIDE}}</div><div class="glass"><b>Genome-wide, hg38</b><span>DatasetNup 3</span></div></div>
+      <div class="slide"><div class="frost">{{ICON_LARGEST_CHROMOSOME}}</div><div class="glass"><b>Largest chromosome</b><span>DatasetNup 2</span></div></div>
+      <div class="slide"><div class="frost">{{ICON_PROMOTER}}</div><div class="glass"><b>Promoters</b><span>DatasetNup 2</span></div></div>
+      <div class="slide"><div class="frost">{{ICON_FIVE_PRIME_UTR}}</div><div class="glass"><b>5′ UTRs</b><span>DatasetNup 2</span></div></div>
+    </div>
+  </div>
+  <div class="species">
+    <div class="species-head">{{ICON_C_ELEGANS}}<h3><em>Caenorhabditis elegans</em>, roundworm</h3></div>
+    <div class="slides">
+      <div class="slide"><div class="frost">{{ICON_BALANCED_BENCHMARK}}</div><div class="glass"><b>Benchmark</b><span>DatasetNup 1, balanced</span></div></div>
+    </div>
+  </div>
+  <div class="species">
+    <div class="species-head">{{ICON_D_MELANOGASTER}}<h3><em>Drosophila melanogaster</em>, fruit fly</h3></div>
+    <div class="slides">
+      <div class="slide"><div class="frost">{{ICON_BALANCED_BENCHMARK}}</div><div class="glass"><b>Benchmark</b><span>DatasetNup 1, balanced</span></div></div>
+      <div class="slide"><div class="frost">{{ICON_LARGEST_CHROMOSOME}}</div><div class="glass"><b>Largest chromosome</b><span>DatasetNup 2</span></div></div>
+      <div class="slide"><div class="frost">{{ICON_PROMOTER}}</div><div class="glass"><b>Promoters</b><span>DatasetNup 2</span></div></div>
+      <div class="slide"><div class="frost">{{ICON_FIVE_PRIME_UTR}}</div><div class="glass"><b>5′ UTRs</b><span>DatasetNup 2</span></div></div>
+    </div>
+  </div>
+  <div class="species">
+    <div class="species-head">{{ICON_S_CEREVISIAE}}<h3><em>Saccharomyces cerevisiae</em>, baker's yeast</h3></div>
+    <div class="slides">
+      <div class="slide"><div class="frost">{{ICON_WHOLE_GENOME}}</div><div class="glass"><b>Whole genome</b><span>DatasetNup 2</span></div></div>
+      <div class="slide"><div class="frost">{{ICON_PROMOTER}}</div><div class="glass"><b>Promoters</b><span>DatasetNup 2</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>A result, as the site would show it</h2>
+  <p class="muted">Real values: the saved cross-validation prediction for {{SEQ_NAME}}, made by the fold-{{FOLD}} model
+  that never saw this sequence (seed 151000). The 147 bases are laid out as 7 rows of 21, because 21 bp is about two
+  turns of the double helix; the dyad base is underlined in eosin.</p>
+  <div class="result">
+    <div class="verdict">
+      <div class="muted">MorphoNup says</div>
+      <div class="word">{{VERDICT}}</div>
+      <div class="bar" role="img" aria-label="Probability {{P}} of being nucleosomal; threshold 0.5"><div class="fill" style="width:{{P_PCT}}%"></div><div class="cut"></div></div>
+      <div class="bar-labels"><span>0, linker</span><span>threshold 0.5</span><span>1, nucleosomal</span></div>
+      <p style="margin-top:12px">Probability of being nucleosomal: <b>{{P}}</b></p>
+      <div class="strands">
+        <div><b>{{P_FWD}}</b><span>reading the strand you gave</span></div>
+        <div><b>{{P_RC}}</b><span>reading the other strand</span></div>
+      </div>
+      <div class="truth">The benchmark labels this sequence <b>{{TRUTH}}</b>.</div>
+    </div>
+    <div class="seqgrid" aria-label="Sequence, 7 rows of 21 bases">{{SEQ_GRID}}</div>
+  </div>
+</section>
+
+<section>
+  <h2>Voice</h2>
+  <p class="muted">Plain words, sentence case, no arrows on buttons, errors that say how to fix the input.</p>
+  <div class="voice">
+    <div><span>Hero</span><b>Does this DNA wrap around a histone?</b></div>
+    <div><span>Below it</span><div>Paste a 147-bp sequence. MorphoNup reads its bases and its predicted shape and tells you whether it is likely to sit on a nucleosome.</div></div>
+    <div><span>Main button</span><div><span class="btn">Predict</span></div></div>
+    <div><span>Too short</span><div>This sequence has 132 bases. MorphoNup needs exactly 147.</div></div>
+    <div><span>Bad letter</span><div>Position 58 is "N". Use only A, C, G and T.</div></div>
+    <div><span>Empty input</span><div>Paste a sequence, or pick one of the examples from this dataset.</div></div>
+  </div>
+</section>
+
+<footer>
+  Generated by <code>website/scripts/make_brand_assets.py</code> from the benchmark files and the saved predictions;
+  no value on this page is typed by hand. Fonts: Atkinson Hyperlegible Next and Mono (SIL Open Font License).
+</footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,39 @@
+# Node and the frontend build
+node_modules/
+dist/
+build/
+.vite/
+*.tsbuildinfo
+coverage/
+playwright-report/
+test-results/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Model bundles are downloaded at build time, never committed
+/models/
+*.h5
+*.keras
+*.npz
+*.onnx
+
+# Secrets and local settings
+.env
+.env.*
+!.env.example
+
+# Editors and operating system
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+*.log
+
+# Reference pictures (stock previews); never publish
+/design/species/_temp/
