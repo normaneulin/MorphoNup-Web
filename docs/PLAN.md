@@ -24,6 +24,15 @@ learning what nucleosome positioning is. The primary job is the prediction; ever
 
 **Choice: React + Vite + TypeScript for the site, FastAPI for the model.**
 
+> **Update 9 November 2026: the site is now fully static and runs on GitHub Pages.** The author wanted hosting on
+> GitHub only, and GitHub Pages cannot run a Python server. The network is written out in TypeScript
+> (`frontend/src/engine/network.ts`, no ONNX or TF.js runtime), the shape lookup and the preprocessing too, and the
+> weights, fitted preprocessing and dataset sequences are exported as static files (`scripts/export_static.py`,
+> `frontend/public/data/`). Predictions run in a Web Worker in the visitor's browser. The FastAPI server stays as the
+> reference: `backend/tests/check_static_parity.py` checks the browser engine against it (480 sequences, largest
+> difference 5.8e-7, no class change, same dataset match and shape values). Deployment:
+> `.github/workflows/pages.yml`.
+
 * Why not Next.js: the site is one tool plus a few content pages. It does not need server rendering, so plain Vite
   is simpler and builds to static files that any host can serve.
 * Why a Python backend: the model, the saved scalers, the PLS reduction and the parity tests already exist in Python.
@@ -233,7 +242,7 @@ number on the site is typed by hand.
 | 2 | Predictor and API, parity with the saved predictions | done 8 Nov for the 6 finished datasets: max difference 6e-4 (GPU vs CPU), 0 class changes; 8 API tests pass. Re-export when the large sets finish |
 | 3 | Frontend: tokens, layout, the Predict flow end to end | done 8 Nov: React 18 + Vite 5 + TypeScript, served by FastAPI (`run.sh`); phone and desktop screenshots checked with Playwright |
 | 4 | Coil, sequence and shape views; Datasets and Model pages | |
-| 5 | Phone, tablet and desktop checks (Playwright screenshots), accessibility, error states, deployment | |
+| 5 | Phone, tablet and desktop checks (Playwright screenshots), accessibility, error states, deployment | 9 Nov: static site (models in the browser), parity 5.8e-7 with the server, GitHub Pages workflow |
 
 The paper (due 13 November) comes first; milestones 1 and 2 can run on the CPU while the GPU trains.
 

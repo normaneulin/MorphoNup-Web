@@ -23,9 +23,10 @@ export default function About() {
 
       <h2>How a prediction is made</h2>
       <p>
-        The site computes the 14 DNA shape tracks of the sequence from the lookup tables of DNAshapeR 1.18.0, applies the
-        preprocessing fitted during training, and runs the models of the chosen dataset. Each model reads both strands and
-        averages them, so a sequence and its reverse complement receive the same prediction.
+        Everything runs in your browser. It computes the 14 DNA shape tracks of the sequence from the lookup tables of
+        DNAshapeR 1.18.0, applies the preprocessing fitted during training, and runs the trained models of the chosen
+        dataset. Each model reads both strands and averages them, so a sequence and its reverse complement receive the
+        same prediction.
       </p>
       <p>
         Each dataset has five models, one per fold of its 5-fold cross-validation. A sequence from the dataset is predicted
@@ -37,7 +38,7 @@ export default function About() {
       <p>
         MorphoNup classifies one 147-bp sequence at a time. It does not map nucleosomes along a longer region, and it does
         not model chromatin remodelers, DNA methylation or histone modifications, which also position nucleosomes in a
-        living cell. Entered sequences are not stored.
+        living cell. Entered sequences are never sent anywhere or stored.
       </p>
 
       <h2>The study</h2>

@@ -15,7 +15,8 @@ __pycache__/
 venv/
 .pytest_cache/
 
-# Model bundles are downloaded at build time, never committed
+# The Keras model bundle (scripts/export_bundle.py) stays on the workstation. Its static export,
+# frontend/public/data (scripts/export_static.py), is committed: GitHub Pages serves it to the browser.
 /models/
 *.h5
 *.keras

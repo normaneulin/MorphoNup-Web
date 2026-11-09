@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 # Run the MorphoNup website on the lab workstation. Open http://localhost:8000 (VS Code forwards the port over SSH).
-#   bash run.sh            build the page if it was never built, then start the server
-#   bash run.sh --build    rebuild the page first (after changing anything in frontend/)
-# Stop with Ctrl+C. The server predicts on the CPU only, so it never takes GPU memory from training.
+#   bash run.sh            build the page (a few seconds), then serve it
+# The site is static, as on GitHub Pages: the models run in the browser, no Python server is needed. Stop with Ctrl+C.
 set -e
 SITE="$(dirname "$(readlink -f "$0")")"
 ENVS="$(readlink -f "$SITE/../../envs")"
-if [ ! -f "$SITE/frontend/dist/index.html" ] || [ "${1:-}" = "--build" ]; then
-  (cd "$SITE/frontend" && PATH="$ENVS/web/bin:$PATH" npm install --no-audit --no-fund && PATH="$ENVS/web/bin:$PATH" npm run build)
-fi
-cd "$SITE/backend"
+export PATH="$ENVS/web/bin:$PATH"
+cd "$SITE/frontend"
+[ -d node_modules ] || npm install --no-audit --no-fund
+npm run build            # always: dist/ may hold a GitHub Pages build (npm run build:pages), made for /MorphoNup-Web/
 echo "MorphoNup: http://localhost:${PORT:-8000}"
-exec "$ENVS/web-api/bin/uvicorn" morphonup_web.app:app --host 127.0.0.1 --port "${PORT:-8000}"
+exec npx vite preview --host 127.0.0.1 --port "${PORT:-8000}" --strictPort

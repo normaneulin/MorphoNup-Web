@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import "@fontsource/atkinson-hyperlegible-next/400.css";
 import "@fontsource/atkinson-hyperlegible-next/600.css";
 import "@fontsource/atkinson-hyperlegible-next/700.css";
@@ -17,7 +17,9 @@ import About from "./pages/About";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    {/* basename: the site lives under /<repository>/ on GitHub Pages (vite build --base) */}
+    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, "") || "/"}
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Header />
       <main>
         <Routes>
@@ -31,7 +33,7 @@ createRoot(document.getElementById("root")!).render(
               <div className="wrap page-head">
                 <h1>Page not found</h1>
                 <p>
-                  Go to <a href="/predict">Predict</a> to try MorphoNup.
+                  Go to <Link to="/predict">Predict</Link> to try MorphoNup.
                 </p>
               </div>
             }

@@ -157,7 +157,7 @@ export function DatasetBrowser({ slug, onUse }: { slug: string; onUse: (sequence
             Previous
           </button>
           <span className="small muted">
-            Page {page} of {pages.toLocaleString()} ({data.total.toLocaleString()} sequences)
+            Page {page} of {pages.toLocaleString()} ({data.total.toLocaleString()} {data.total === 1 ? "sequence" : "sequences"})
           </span>
           <button type="button" className="btn-quiet" disabled={page >= pages} onClick={() => setPage(page + 1)}>
             Next

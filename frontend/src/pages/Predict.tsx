@@ -49,6 +49,11 @@ export default function Predict() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groups]);
 
+  // load the chosen dataset's models and sequences in the background, so the first prediction is quick
+  useEffect(() => {
+    if (dataset) api.prepare(dataset.slug).catch(() => undefined);   // a failure shows when predicting
+  }, [dataset?.slug]);
+
   const reset = () => {
     setPhase("idle");
     setPending(null);
