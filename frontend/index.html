@@ -3,11 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- ?v=: browsers keep favicons in a long-lived cache of their own; change it when the icon changes -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
     <meta name="description" content="MorphoNup predicts whether a 147-bp DNA sequence wraps around a histone, from its sequence and its DNA shape." />
     <meta name="theme-color" content="#FAF8FC" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#17122E" media="(prefers-color-scheme: dark)" />
     <title>MorphoNup</title>
+    <script>
+      /* Choose the theme before the first paint, so the page never flashes the wrong one. src/theme.ts takes over after. */
+      {
+        let saved = null;
+        try { saved = localStorage.getItem("morphonup-theme"); } catch {}
+        document.documentElement.dataset.theme =
+          saved === "light" || saved === "dark" ? saved : matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

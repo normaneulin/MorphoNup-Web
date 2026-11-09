@@ -1,7 +1,9 @@
 import { Link, NavLink } from "react-router-dom";
+import { Moon, Sun } from "lucide-react";
 import logo from "../assets/logo.svg";
 import logoDark from "../assets/logo-dark.svg";
 import { ICONS } from "../assets/icons";
+import { flipTheme, useTheme } from "../theme";
 
 export function Icon({ name, size = 24, label }: { name: string; size?: number; label?: string }) {
   return (
@@ -31,6 +33,17 @@ export function Logo({ size = 36, className = "" }: { size?: number; className?:
   );
 }
 
+function ThemeToggle() {
+  const isDark = useTheme() === "dark";
+  const label = isDark ? "Switch to light mode" : "Switch to dark mode";
+  const Glyph = isDark ? Sun : Moon;
+  return (
+    <button type="button" className="theme-toggle" onClick={flipTheme} aria-label={label} title={label}>
+      <Glyph size={20} strokeWidth={1.75} />
+    </button>
+  );
+}
+
 export function Header() {
   return (
     <header className="site-header">
@@ -44,6 +57,7 @@ export function Header() {
           <NavLink to="/datasets">Datasets</NavLink>
           <NavLink to="/about">About</NavLink>
         </nav>
+        <ThemeToggle />
       </div>
     </header>
   );

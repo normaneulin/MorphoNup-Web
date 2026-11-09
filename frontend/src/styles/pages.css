@@ -3,8 +3,7 @@
 .page-head h1 { font-size: clamp(2rem, 4.6vw, 2.9rem); }
 .page-head p { margin-top: 10px; }
 .lead { font-size: 1.15rem; }
-.problem { color: var(--eosin); font-weight: 600; margin: 8px 0 0; }
-@media (prefers-color-scheme: light) { .problem { color: #B23A62; } }
+.problem { color: var(--eosin-text); font-weight: 600; margin: 8px 0 0; }
 
 /* ---------------------------------------------------------------- home */
 .hero { display: grid; gap: 32px; align-items: center; padding-top: 56px; padding-bottom: 56px; }
@@ -217,7 +216,7 @@
 }
 
 /* ---------------------------------------------------------------- chromatin scanner (while predicting) */
-.scanner { --scan-bg: #17122E; --scan-dna: #EEEAF9; --scan-dna-back: #6F6798; --scan-core: #E27596;
+.scanner { --scan-bg: var(--slide); --scan-dna: var(--ink); --scan-core: var(--eosin);
   background: var(--scan-bg); overflow: hidden; }
 .scanner svg { display: block; }
 .scan-linker, .scan-dna { fill: var(--scan-dna); }
@@ -236,7 +235,7 @@
 @media (max-width: 719px), (hover: none) and (pointer: coarse) { .scan-line { display: none; } }
 .scan-lens { transition: stroke 0.3s, opacity 0.3s; }
 @keyframes scan-sweep { from { transform: translateX(0); } to { transform: translateX(var(--lens)); } }
-.scan-caption { padding: 0 16px 14px; text-align: center; color: #B9B2D6; font-size: 0.92rem; font-weight: 600; }
+.scan-caption { padding: 0 16px 14px; text-align: center; color: var(--ink-2); font-size: 0.92rem; font-weight: 600; }
 .scanner.is-landed .scan-caption { color: var(--scan-dna); }
 .scanner.is-scanning .scan-caption::after { content: ""; display: inline-block; width: 1.2em; text-align: left;
   animation: scan-dots 1.2s steps(4) infinite; }
@@ -269,7 +268,7 @@
 
 /* scanner legend */
 .scanner { position: relative; }
-.scan-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding: 0 16px 12px; font-size: 0.78rem; color: #B9B2D6; }
+.scan-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding: 0 16px 12px; font-size: 0.78rem; color: var(--ink-2); }
 .scan-legend span { display: inline-flex; align-items: center; gap: 6px; }
 .legend-core path { fill: var(--scan-core); }
 .legend-dna { fill: none; stroke: var(--scan-dna); stroke-width: 2.4; stroke-linecap: round; }
