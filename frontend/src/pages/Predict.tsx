@@ -23,6 +23,8 @@ export default function Predict() {
   const [result, setResult] = useState<Prediction | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
+  const [example, setExample] = useState<"nucleosomal" | "linker" | null>(null);   // an example is being loaded
+  const [download, setDownload] = useState<string | null>(null);                   // model download, for the scanner
   const pendingRef = useRef<Prediction | null>(null);
   const panelRef = useRef<HTMLElement>(null);
   const autoRun = useRef(Boolean(params.get("dataset") && params.get("seq")));
@@ -53,6 +55,13 @@ export default function Predict() {
   useEffect(() => {
     if (dataset) api.prepare(dataset.slug).catch(() => undefined);   // a failure shows when predicting
   }, [dataset?.slug]);
+
+  // while the models download, the scanner says so (on a slow connection this is what the prediction waits for)
+  useEffect(() => api.onProgress(({ slug: s, loaded, total }) => {
+    if (s !== slug) return;
+    const mb = (x: number) => (x / 1e6).toFixed(1);
+    setDownload(total && loaded < total ? `Downloading the models of this dataset (${mb(loaded)} of ${mb(total)} MB)` : null);
+  }), [slug]);
 
   const reset = () => {
     setPhase("idle");
@@ -125,11 +134,15 @@ export default function Predict() {
     window.setTimeout(() => document.getElementById("sequence")?.focus(), 360);
   };
   const random = async (label: "nucleosomal" | "linker") => {
-    if (!dataset) return;
+    if (!dataset || example) return;
+    setExample(label);
+    setError(null);
     try {
       use((await api.random(dataset.slug, label)).sequence);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : String(e));
+    } finally {
+      setExample(null);
     }
   };
 
@@ -180,7 +193,7 @@ export default function Predict() {
 
         <div className="predict-col">
           <section className="predictor" ref={panelRef} aria-label="MorphoNup predictor">
-            <ChromatinScanner phase={phase} target={pending ? pending.label : null} onLanded={landed} />
+            <ChromatinScanner phase={phase} target={pending ? pending.label : null} onLanded={landed} note={download} />
             <div className="predictor-body">
               {/* after Predict, the input folds into one line so the result is in view */}
               <Collapse open={!inputOpen}>
@@ -207,11 +220,11 @@ export default function Predict() {
                   </div>
                   <SequenceInput text={text} onText={(t) => { setText(t); reset(); }} showLengthError={tried} />
                   <div className="seq-actions">
-                    <button type="button" className="btn-quiet" disabled={!dataset} onClick={() => random("nucleosomal")}>
-                      A nucleosomal example
+                    <button type="button" className="btn-quiet" disabled={!dataset || example !== null} onClick={() => random("nucleosomal")}>
+                      {example === "nucleosomal" ? "Loading the dataset…" : "A nucleosomal example"}
                     </button>
-                    <button type="button" className="btn-quiet" disabled={!dataset} onClick={() => random("linker")}>
-                      A linker example
+                    <button type="button" className="btn-quiet" disabled={!dataset || example !== null} onClick={() => random("linker")}>
+                      {example === "linker" ? "Loading the dataset…" : "A linker example"}
                     </button>
                     <button type="button" className="btn-quiet" disabled={!dataset} onClick={() => setBrowser(true)}>
                       Browse the dataset

@@ -127,6 +127,7 @@ export function DatasetBrowser({ slug, onUse }: { slug: string; onUse: (sequence
         />
       </div>
       {error && <p className="problem">{error}</p>}
+      {!data && !error && <p className="muted">Loading the sequences of this dataset…</p>}
       {data && data.items.length === 0 && <p className="muted">No sequence matches this search.</p>}
       <ul className="browser-list">
         {data?.items.map((item) => (

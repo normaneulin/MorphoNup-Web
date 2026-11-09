@@ -1,63 +1,46 @@
 // Runs predictions off the main thread, so the page and its animation stay smooth.
-// Loads the shape tables once, and each dataset's models and sequences the first time that dataset is used.
+// Loads the shape tables once and each dataset's models the first time that dataset is used, and reports download
+// progress, so the page can say what it is waiting for. The page finds the dataset row and sends the fold to use.
 
-import { DatasetSequences } from "./dataset";
+import { download, downloadJson } from "./download";
 import { type DatasetModel, type ModelFile, parseModel } from "./network";
-import { encode, runPrediction } from "./predict";
+import { encode, score } from "./predict";
 import { parseTables, type ShapeTables } from "./shape";
 
 const DATA = `${import.meta.env.BASE_URL}data/`;
 
 let tables: Promise<ShapeTables> | null = null;
 const models = new Map<string, Promise<DatasetModel>>();
-const sequences = new Map<string, Promise<DatasetSequences>>();
-
-async function get(url: string, kind: "json" | "buffer") {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Could not load ${url} (error ${res.status}).`);
-  return kind === "json" ? res.json() : res.arrayBuffer();
-}
 
 function loadTables() {
-  tables ??= get(`${DATA}shape_tables.json`, "json").then(parseTables);
+  tables ??= downloadJson<Parameters<typeof parseTables>[0]>(`${DATA}shape_tables.json`).then(parseTables);
   return tables;
 }
 
 function loadModel(slug: string) {
   if (!models.has(slug)) {
-    models.set(slug, Promise.all([get(`${DATA}${slug}/model.json`, "json"), get(`${DATA}${slug}/model.bin`, "buffer")])
-      .then(([meta, buffer]) => parseModel(meta as ModelFile, buffer as ArrayBuffer)));
+    const progress = (loaded: number, total: number) => self.postMessage({ progress: { slug, loaded, total } });
+    models.set(slug, Promise.all([downloadJson<ModelFile>(`${DATA}${slug}/model.json`), download(`${DATA}${slug}/model.bin`, progress)])
+      .then(([meta, buffer]) => parseModel(meta, buffer)));
   }
   return models.get(slug)!;
-}
-
-function loadSequences(slug: string, n: number) {
-  if (!sequences.has(slug)) {
-    sequences.set(slug, get(`${DATA}${slug}/sequences.bin`, "buffer").then((b) => new DatasetSequences(b as ArrayBuffer, n)));
-  }
-  return sequences.get(slug)!;
 }
 
 export interface WorkerRequest {
   id: number;
   slug: string;
-  n: number;
-  sequence?: string;          // absent: only load the dataset ahead of time
+  sequence?: string;          // absent: only load the dataset's models ahead of time
+  fold?: number;              // the held-out fold model of a dataset sequence; 0 = the mean of all fold models
 }
 
 self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
-  const { id, slug, n, sequence } = event.data;
+  const { id, slug, sequence, fold = 0 } = event.data;
   try {
-    const [t, model, data] = await Promise.all([loadTables(), loadModel(slug), loadSequences(slug, n)]);
-    if (sequence === undefined) {
-      self.postMessage({ id, ok: true, result: null });
-      return;
-    }
-    const result = runPrediction(model, t, data, encode(sequence));
+    const [t, model] = await Promise.all([loadTables(), loadModel(slug)]);
+    const result = sequence === undefined ? null : score(model, t, encode(sequence), fold);
     self.postMessage({ id, ok: true, result });
   } catch (e) {
     models.delete(slug);       // a failed download is tried again next time
-    sequences.delete(slug);
     tables = null;
     self.postMessage({ id, ok: false, message: e instanceof Error ? e.message : String(e) });
   }

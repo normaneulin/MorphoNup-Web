@@ -122,7 +122,9 @@ export type ScanPhase = "idle" | "scanning" | "done";
 
 // phase "idle": the strip rests (or glides to a stop). "scanning": it speeds up and keeps moving until `target`
 // (the prediction) is known, then decelerates and lands on that kind of DNA and calls onLanded. "done": it stays there.
-export function ChromatinScanner({ phase, target, onLanded }: { phase: ScanPhase; target: Label | null; onLanded: () => void }) {
+export function ChromatinScanner({ phase, target, onLanded, note }: {
+  phase: ScanPhase; target: Label | null; onLanded: () => void; note?: string | null;   // note: shown while scanning
+}) {
   const box = useRef<HTMLDivElement>(null);
   const strip = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(560);
@@ -244,7 +246,7 @@ export function ChromatinScanner({ phase, target, onLanded }: { phase: ScanPhase
   const lensX = width / 2 - lens / 2;
   const caption = landed
     ? landed === "nucleosomal" ? "Landed on a nucleosome" : "Landed on linker DNA"
-    : phase === "scanning" ? "Reading the sequence and its shape" : "Ready";
+    : phase === "scanning" ? note ?? "Reading the sequence and its shape" : "Ready";
   return (
     <div className={`scanner is-${landed ? "landed" : phase}`} ref={box}>
       <div className="scan-view" style={{ height: h }} role="img" aria-label={caption}>

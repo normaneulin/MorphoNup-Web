@@ -4,7 +4,8 @@
 // for reference and tests (backend/tests/check_static_parity.py).
 
 import { DatasetSequences } from "./engine/dataset";
-import type { EngineResult } from "./engine/predict";
+import { download, downloadJson } from "./engine/download";
+import { encode, findRow, type Scores } from "./engine/predict";
 import type { WorkerRequest } from "./engine/worker";
 
 export type Label = "nucleosomal" | "linker";
@@ -73,17 +74,15 @@ export interface Prediction {
 export class ApiError extends Error {}
 
 const DATA = `${import.meta.env.BASE_URL}data/`;
-const OFFLINE = "The data of this page could not be loaded. Check the internet connection, then reload the page.";
+const OFFLINE = "The data of this page could not be loaded. Check the internet connection, then try again.";
 
-async function fetchData(url: string, kind: "json" | "buffer") {
-  let res: Response;
+/** Downloads with the stall limit of engine/download.ts; any failure becomes one plain message. */
+async function fetchData<T>(url: string, kind: "json" | "buffer"): Promise<T> {
   try {
-    res = await fetch(url);
+    return (kind === "json" ? await downloadJson<T>(url) : await download(url)) as T;
   } catch {
     throw new ApiError(OFFLINE);
   }
-  if (!res.ok) throw new ApiError(`${OFFLINE} (Error ${res.status} for ${url.slice(DATA.length)}.)`);
-  return kind === "json" ? res.json() : res.arrayBuffer();
 }
 
 /** Keeps a promise unless it fails, so a failed download is tried again on the next call. */
@@ -99,7 +98,7 @@ function cached<K, V>(make: (key: K) => Promise<V>) {
   };
 }
 
-const groups = cached((_: "all") => fetchData(`${DATA}datasets.json`, "json") as Promise<SpeciesGroup[]>);
+const groups = cached((_: "all") => fetchData<SpeciesGroup[]>(`${DATA}datasets.json`, "json"));
 
 async function datasetItem(slug: string): Promise<DatasetItem> {
   for (const g of await groups("all")) {
@@ -112,9 +111,11 @@ async function datasetItem(slug: string): Promise<DatasetItem> {
   throw new ApiError(`No dataset called ${slug}.`);
 }
 
+// The sequences of a dataset are downloaded once, here on the page: the browser, the examples and the check whether an
+// entered sequence belongs to the dataset all use this copy (the worker only needs the models).
 const sequenceFile = cached(async (slug: string) => {
   const d = await datasetItem(slug);
-  return new DatasetSequences((await fetchData(`${DATA}${slug}/sequences.bin`, "buffer")) as ArrayBuffer, d.n ?? 0);
+  return new DatasetSequences(await fetchData<ArrayBuffer>(`${DATA}${slug}/sequences.bin`, "buffer"), d.n ?? 0);
 });
 
 let lastSearch: { key: string; indices: number[] } | null = null;
@@ -132,27 +133,51 @@ function item(data: DatasetSequences, index: number): SequenceItem {
 
 // ------------------------------------------------------------------ the prediction worker
 
+export interface Progress { slug: string; loaded: number; total: number }
+const progressListeners = new Set<(p: Progress) => void>();
+
+const SILENCE_MS = 40000;    // a worker that sends nothing (no progress, no answer) for this long is restarted
 let worker: Worker | null = null;
 let nextId = 1;
-const pending = new Map<number, { resolve: (r: EngineResult | null) => void; reject: (e: Error) => void }>();
+let lastHeard = 0;
+let watchdog = 0;
+const pending = new Map<number, { resolve: (r: Scores | null) => void; reject: (e: Error) => void }>();
 
-function engine(request: Omit<WorkerRequest, "id">): Promise<EngineResult | null> {
+function stopWorker(message: string) {
+  for (const job of pending.values()) job.reject(new ApiError(message));
+  pending.clear();
+  worker?.terminate();
+  worker = null;
+  window.clearInterval(watchdog);
+  watchdog = 0;
+}
+
+function engine(request: Omit<WorkerRequest, "id">): Promise<Scores | null> {
   if (!worker) {
     worker = new Worker(new URL("./engine/worker.ts", import.meta.url), { type: "module" });
-    worker.onmessage = (e: MessageEvent<{ id: number; ok: boolean; result?: EngineResult | null; message?: string }>) => {
-      const job = pending.get(e.data.id);
-      pending.delete(e.data.id);
+    worker.onmessage = (e: MessageEvent<{ id?: number; ok?: boolean; result?: Scores | null; message?: string;
+                                          progress?: Progress }>) => {
+      lastHeard = Date.now();
+      if (e.data.progress) {
+        progressListeners.forEach((f) => f(e.data.progress!));
+        return;
+      }
+      const job = pending.get(e.data.id!);
+      pending.delete(e.data.id!);
       if (!job) return;
       if (e.data.ok) job.resolve(e.data.result ?? null);
       else job.reject(new ApiError(e.data.message?.startsWith("Could not load") ? OFFLINE : e.data.message));
     };
-    worker.onerror = () => {
-      for (const job of pending.values()) job.reject(new ApiError("The prediction could not run in this browser."));
-      pending.clear();
-      worker?.terminate();
-      worker = null;
-    };
+    worker.onerror = () => stopWorker("The prediction could not start. Reload the page, then try again.");
   }
+  if (!watchdog) {
+    watchdog = window.setInterval(() => {
+      if (pending.size && Date.now() - lastHeard > SILENCE_MS) {
+        stopWorker("The prediction is taking too long, probably because of a slow connection. Try again.");
+      }
+    }, 2000);
+  }
+  if (!pending.size) lastHeard = Date.now();
   const id = nextId++;
   return new Promise((resolve, reject) => {
     pending.set(id, { resolve, reject });
@@ -179,10 +204,19 @@ export const api = {
     return item(data, indices[Math.floor(Math.random() * indices.length)]);
   },
 
-  /** Loads a dataset's models and sequences ahead of the first prediction. */
+  /** Starts loading a dataset's sequences (here) and models (in the worker) before the first prediction. */
   prepare: async (slug: string) => {
-    const d = await datasetItem(slug);
-    await engine({ slug, n: d.n ?? 0 });
+    await datasetItem(slug);
+    await Promise.all([
+      sequenceFile(slug).then((data) => { window.setTimeout(() => data.lookup(new Uint8Array(147)), 0); }),   // builds the index
+      engine({ slug }),
+    ]);
+  },
+
+  /** Download progress of a dataset's models, for the scanner caption. Returns the function that stops listening. */
+  onProgress: (listener: (p: Progress) => void) => {
+    progressListeners.add(listener);
+    return () => { progressListeners.delete(listener); };
   },
 
   predict: async (slug: string, text: string): Promise<Prediction> => {
@@ -190,17 +224,19 @@ export const api = {
     const sequence = cleanSequence(text);
     const problem = sequenceProblem(sequence);
     if (problem) throw new ApiError(problem.message);
-    const r = (await engine({ slug, n: d.n ?? 0, sequence }))!;
+    engine({ slug }).catch(() => undefined);                 // the models download while the sequences do
+    const match = findRow(await sequenceFile(slug), encode(sequence));
+    const scores = (await engine({ slug, sequence, fold: match.fold ?? 0 }))!;
     return {
       dataset: d.id, sequence, length: sequence.length,
-      probability: r.probability, probability_forward: r.probability_forward, probability_reverse: r.probability_reverse,
-      label: r.label, threshold: 0.5,
+      probability: scores.probability, probability_forward: scores.probability_forward,
+      probability_reverse: scores.probability_reverse, label: scores.label, threshold: 0.5,
       model: {
-        kind: r.in_dataset ? "held-out fold model" : "mean of the five fold models",
-        fold: r.fold, k: d.k ?? 5, seed: d.seed ?? 0, stage: d.stage ?? "",
+        kind: match.in_dataset ? "held-out fold model" : "mean of the five fold models",
+        fold: match.fold, k: d.k ?? 5, seed: d.seed ?? 0, stage: d.stage ?? "",
       },
-      in_dataset: r.in_dataset,
-      shape: r.shape,
+      in_dataset: match.in_dataset,
+      shape: scores.shape,
     };
   },
 };

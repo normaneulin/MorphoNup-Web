@@ -2,6 +2,8 @@
 //   a sequence of the dataset (either strand) is predicted by the fold model whose test part contained it, the
 //   out-of-fold prediction behind the reported accuracy; any other sequence gets the mean of the fold models.
 // Each model reads both strands; the prediction is their mean, nucleosomal from 0.5.
+// The page finds the dataset row (findRow, main thread, which holds the dataset's sequences) and the Web Worker
+// computes the scores (score). runPrediction joins the two; the parity test runs it.
 
 import { type DatasetSequences, type Label } from "./dataset";
 import { type DatasetModel, predictCodes } from "./network";
@@ -9,15 +11,20 @@ import { type ShapeTables } from "./shape";
 
 export const THRESHOLD = 0.5;
 
-export interface EngineResult {
+export interface RowMatch {
+  fold: number | null;
+  in_dataset: null | { name: string; label: Label; strand: string; copies: number };
+}
+
+export interface Scores {
   probability: number;
   probability_forward: number;
   probability_reverse: number;
   label: Label;
-  fold: number | null;
-  in_dataset: null | { name: string; label: Label; strand: string; copies: number };
   shape: Record<string, (number | null)[]>;
 }
+
+export type EngineResult = Scores & RowMatch;
 
 export function encode(sequence: string): Uint8Array {
   const codes = new Uint8Array(sequence.length);
@@ -29,13 +36,21 @@ export function encode(sequence: string): Uint8Array {
   return codes;
 }
 
-export function runPrediction(model: DatasetModel, tables: ShapeTables, data: DatasetSequences,
-                              codes: Uint8Array): EngineResult {
+/** The dataset row of a sequence: the same strand preferred, else its reverse complement; null fold if absent. */
+export function findRow(data: DatasetSequences, codes: Uint8Array): RowMatch {
   const { rows, same } = data.lookup(codes);
-  const index = rows.length ? (same.length ? same[0] : rows[0]) : null;
-  const row = index === null ? null : data.row(index);
-  const r = predictCodes(model, tables, codes, row ? row.fold : 0);
-  const shape: EngineResult["shape"] = {};
+  if (!rows.length) return { fold: null, in_dataset: null };
+  const row = data.row(same.length ? same[0] : rows[0]);
+  return {
+    fold: row.fold,
+    in_dataset: { name: row.name, label: row.label, strand: same.length ? "same" : "reverse complement", copies: rows.length },
+  };
+}
+
+/** Scores under the fold model `fold`, or the mean of all fold models when fold is 0. */
+export function score(model: DatasetModel, tables: ShapeTables, codes: Uint8Array, fold: number): Scores {
+  const r = predictCodes(model, tables, codes, fold);
+  const shape: Scores["shape"] = {};
   for (const [name, values] of Object.entries(r.raw)) {
     shape[name] = Array.from(values, (v) => (Number.isNaN(v) ? null : Math.round(v * 100) / 100));
   }
@@ -44,10 +59,12 @@ export function runPrediction(model: DatasetModel, tables: ShapeTables, data: Da
     probability_forward: r.p_fwd,
     probability_reverse: r.p_rc,
     label: r.p >= THRESHOLD ? "nucleosomal" : "linker",
-    fold: row ? row.fold : null,
-    in_dataset: row
-      ? { name: row.name, label: row.label, strand: same.length ? "same" : "reverse complement", copies: rows.length }
-      : null,
     shape,
   };
+}
+
+export function runPrediction(model: DatasetModel, tables: ShapeTables, data: DatasetSequences,
+                              codes: Uint8Array): EngineResult {
+  const match = findRow(data, codes);
+  return { ...score(model, tables, codes, match.fold ?? 0), ...match };
 }
