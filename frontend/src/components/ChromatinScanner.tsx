@@ -199,19 +199,18 @@ export function ChromatinScanner({ phase, target, onLanded }: { phase: ScanPhase
             landedRef.current();
           }
         }
-      } else if (scanning && t && reduced) {
-        s.x = Math.round(s.x / U) * U + (t === "nucleosomal" ? U / 2 : 0);
-        s.v = 0;
-        setLanded(t);
-        landedRef.current();
-      } else if (!reduced) {
-        const goal = scanning ? SPEED : 0;
+      } else {
+        // With the "reduce motion" setting of the phone or computer the scan still plays, slower:
+        // it is the sign that the prediction runs, so it is calmed rather than removed (about 1 nucleosome a second).
+        const top = reduced ? SPEED * 0.7 : SPEED;
+        const goal = scanning ? top : 0;
         s.v += (goal - s.v) * Math.min(1, dt * 3.5);          // smooth start and smooth stop
         if (Math.abs(s.v) < 0.5 && goal === 0) s.v = 0;
         s.x += s.v * dt;
-        if (scanning && t && now - s.start >= MIN_SCAN_MS && s.v > SPEED * 0.85) {
+        if (scanning && t && now - s.start >= MIN_SCAN_MS && s.v > top * 0.85) {
           const offset = t === "nucleosomal" ? U / 2 : 0;
-          const x1 = Math.ceil((s.x + 0.6 * U - offset) / U) * U + offset;   // next centre with room to slow down
+          const room = (reduced ? 0.35 : 0.6) * U;                          // the slower strip needs less room to stop
+          const x1 = Math.ceil((s.x + room - offset) / U) * U + offset;      // next centre with room to slow down
           s.landing = { x0: s.x, x1, v0: s.v, t: now, ms: ((2 * (x1 - s.x)) / s.v) * 1000, label: t };
         }
       }
