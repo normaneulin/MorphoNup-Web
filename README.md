@@ -24,9 +24,10 @@ sequence is never sent anywhere.
 * **In the browser.** The network is written out in TypeScript (`frontend/src/engine`) and runs in a Web Worker with the
   exported weights. It gives the same probabilities as the Keras models within 1e-6, with no change of class.
 
-Datasets on the site: 8 of the 12 (DatasetNup 1: human, roundworm, fruit fly; DatasetNup 3: human hg38; DatasetNup 2:
-human 5′ UTRs, promoters and largest chromosome, fruit fly 5′ UTRs). The other four are added when their training
-finishes.
+Datasets on the site: all 12 benchmark datasets (DatasetNup 1: human, roundworm, fruit fly; DatasetNup 3: human hg38;
+DatasetNup 2: human and fruit fly 5′ UTRs, promoters and largest chromosome, baker's yeast whole genome and promoters).
+Each uses the five fold models of its 5-fold run with seed 151000; the six largest DatasetNup 2 datasets use the base
+stage until their refits finish.
 
 ## Run it locally
 
