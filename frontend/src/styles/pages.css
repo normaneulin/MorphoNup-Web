@@ -73,8 +73,15 @@
 .seq-input textarea:focus { border-color: var(--haem); }
 .seq-input textarea:focus-visible { outline: none; }      /* no red focus ring; the violet border shows focus */
 .seq-input textarea[aria-invalid="true"] { border-color: var(--eosin); }
-.seq-status { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: baseline; margin-top: 6px; }
+.seq-status { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; margin-top: 6px; }
 .seq-status .count { font-size: 0.86rem; color: var(--ink-2); }
+.seq-status .problem { flex-basis: 100%; }
+/* "x Clear", a small chip next to the count; its touch area is larger than it looks */
+.clear-chip { position: relative; margin-left: auto; display: inline-flex; align-items: center; gap: 3px; padding: 0 8px 0 6px;
+  border: 1px solid var(--rule); border-radius: 999px; background: var(--frost); color: var(--ink-2);
+  font-size: 0.78rem; font-weight: 600; line-height: 1.55; }
+.clear-chip:hover { color: var(--ink); border-color: var(--haem); }
+.clear-chip::after { content: ""; position: absolute; inset: -6px; }
 .seq-status .count.ok { color: var(--haem); font-weight: 700; }
 .seq-status .problem { font-size: 0.9rem; margin: 0; }
 .seq-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
@@ -88,6 +95,8 @@
 .segmented button { border: 0; background: transparent; padding: 7px 12px; font-weight: 600; font-size: 0.9rem; }
 .segmented button + button { border-left: 1px solid var(--rule); }
 .segmented button[aria-pressed="true"] { background: var(--haem); color: var(--on-haem); }
+.browser-loading { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 48px 16px; text-align: center; }
+.browser-loading .spinner { color: var(--haem); }
 .browser-list { list-style: none; margin: 12px 0 0; padding: 0; }
 .browser-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; align-items: center; padding: 9px 0;
   border-top: 1px solid var(--rule); }

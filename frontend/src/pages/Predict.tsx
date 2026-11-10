@@ -8,6 +8,7 @@ import { Modal } from "../components/Modal";
 import { DatasetSlides } from "../components/Picker";
 import { Result } from "../components/Result";
 import { DatasetBrowser, SequenceInput } from "../components/SequencePanel";
+import { BusyButton } from "../components/Spinner";
 import { SpeciesCarousel } from "../components/SpeciesCarousel";
 
 export default function Predict() {
@@ -218,22 +219,20 @@ export default function Predict() {
                     <h2>Sequence</h2>
                     {dataset && <span className="small muted">{dataset.name}, {dataset.collection}</span>}
                   </div>
-                  <SequenceInput text={text} onText={(t) => { setText(t); reset(); }} showLengthError={tried} />
+                  <SequenceInput text={text} onText={(t) => { setText(t); reset(); }} onClear={() => use("")}
+                    showLengthError={tried} />
                   <div className="seq-actions">
-                    <button type="button" className="btn-quiet" disabled={!dataset || example !== null} onClick={() => random("nucleosomal")}>
-                      {example === "nucleosomal" ? "Loading the dataset…" : "A nucleosomal example"}
-                    </button>
-                    <button type="button" className="btn-quiet" disabled={!dataset || example !== null} onClick={() => random("linker")}>
-                      {example === "linker" ? "Loading the dataset…" : "A linker example"}
-                    </button>
-                    <button type="button" className="btn-quiet" disabled={!dataset} onClick={() => setBrowser(true)}>
+                    <BusyButton busy={example === "nucleosomal"} busyLabel="Loading the dataset" disabled={!dataset || example !== null}
+                      onClick={() => random("nucleosomal")}>
+                      A nucleosomal example
+                    </BusyButton>
+                    <BusyButton busy={example === "linker"} busyLabel="Loading the dataset" disabled={!dataset || example !== null}
+                      onClick={() => random("linker")}>
+                      A linker example
+                    </BusyButton>
+                    <button type="button" className="btn-quiet btn-outline" disabled={!dataset} onClick={() => setBrowser(true)}>
                       Browse the dataset
                     </button>
-                    {text && (
-                      <button type="button" className="btn-quiet" onClick={() => use("")}>
-                        Clear
-                      </button>
-                    )}
                   </div>
                   <button type="button" className="btn btn-predict" onClick={() => predict()} disabled={phase === "scanning" || !dataset}>
                     Predict

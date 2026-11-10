@@ -68,11 +68,12 @@ button { cursor: pointer; }
 .small { font-size: 0.86rem; }
 .mono { font-family: var(--mono); }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-/* "Reduce motion": decorative animations and transitions are removed. Three motions stay, calmer: the chromatin scanner
-   (slower, in ChromatinScanner.tsx) with the sweep of its lens, and the species carousel, which slides briefly so a
-   change of species can be followed. */
+/* "Reduce motion": decorative animations and transitions are removed. Four motions stay, calmer: the chromatin scanner
+   (slower, in ChromatinScanner.tsx) with the sweep of its lens, the species carousel, which slides briefly so a
+   change of species can be followed, and the loading spinners, which say that something is still on its way. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
+  .spinner { animation: spin 1.6s linear infinite !important; }
   .scanner.is-scanning .scan-line { animation: scan-sweep 1.3s ease-in-out infinite alternate !important; }
   .car-item { transition: transform 0.25s ease-out, opacity 0.25s ease-out !important; }
   .car-track.no-anim .car-item, .car-track[data-dragging] .car-item { transition: none !important; }
@@ -118,15 +119,27 @@ main { padding-bottom: 96px; }
   color: var(--ink); border-radius: var(--radius-s); padding: 7px 12px; font-weight: 600; font-size: 0.92rem; }
 .btn-quiet:hover { border-color: var(--haem); }
 .btn-quiet[aria-pressed="true"] { border-color: var(--haem); background: var(--haem-soft); }
+/* a quiet button that stands out from its neighbours: violet outline and text */
+.btn-outline { border: 1.5px solid var(--haem); color: var(--haem); padding: 6.5px 11.5px; }
+.btn-outline:hover { background: var(--haem-soft); }
+.btn-outline:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-outline:disabled:hover { background: var(--paper); }
+
+/* loading spinner (Spinner.tsx) */
+.spinner { flex: none; animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+/* a quiet button with a spinner on its right while it loads (BusyButton in Spinner.tsx) */
+.busy-btn { max-width: 100%; }
+.busy-btn .btn-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.busy-btn[aria-busy="true"] { cursor: progress; }
+.busy-btn .spinner { color: var(--haem); }
 
 /* chips for labels */
 .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 700; padding: 2px 9px;
   border-radius: 999px; white-space: nowrap; }
-.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 .chip.nucleosomal { color: var(--haem); background: var(--haem-soft); }
 .chip.linker { color: var(--teal); background: var(--teal-soft); }
 .chip.waiting { color: var(--ink-2); background: var(--frost); }
-.chip.waiting::before { display: none; }
 
 /* footer */
 .site-footer { border-top: 1px solid var(--rule); padding: 28px 0 40px; color: var(--ink-2); font-size: 0.9rem; }

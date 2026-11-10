@@ -1,16 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { X } from "lucide-react";
 import type { Label, SequencePage } from "../api";
 import { api, ApiError, cleanSequence, sequenceProblem } from "../api";
+import { Spinner } from "./Spinner";
 
 export function SequenceInput({
   text,
   onText,
+  onClear,
   showLengthError,
 }: {
   text: string;
   onText: (t: string) => void;
+  onClear: () => void;
   showLengthError: boolean;
 }) {
+  const area = useRef<HTMLTextAreaElement>(null);
   const seq = cleanSequence(text);
   const problem = seq ? sequenceProblem(seq) : null;
   const visible = problem && (problem.position !== undefined || showLengthError) ? problem : null;
@@ -21,6 +26,7 @@ export function SequenceInput({
       </label>
       <textarea
         id="sequence"
+        ref={area}
         value={text}
         onChange={(e) => onText(e.target.value)}
         rows={5}
@@ -29,11 +35,18 @@ export function SequenceInput({
         autoComplete="off"
         placeholder="Paste a 147-bp sequence (A, C, G, T), or pick one from the dataset below."
         aria-invalid={visible ? true : undefined}
-        aria-describedby="sequence-status"
+        aria-describedby={visible ? "sequence-count sequence-problem" : "sequence-count"}
       />
       <div id="sequence-status" className="seq-status">
-        <span className={seq.length === 147 && !problem ? "count ok" : "count"}>{seq.length} / 147</span>
-        {visible && <span className="problem">{visible.message}</span>}
+        <span id="sequence-count" className={seq.length === 147 && !problem ? "count ok" : "count"}>{seq.length} / 147</span>
+        {text && (
+          <button type="button" className="clear-chip" aria-label="Clear the sequence"
+            onClick={() => { onClear(); area.current?.focus(); }}>
+            <X size={12} strokeWidth={2.8} aria-hidden="true" />
+            Clear
+          </button>
+        )}
+        {visible && <span id="sequence-problem" className="problem">{visible.message}</span>}
       </div>
     </div>
   );
@@ -127,7 +140,12 @@ export function DatasetBrowser({ slug, onUse }: { slug: string; onUse: (sequence
         />
       </div>
       {error && <p className="problem">{error}</p>}
-      {!data && !error && <p className="muted">Loading the sequences of this dataset…</p>}
+      {!data && !error && (
+        <div className="browser-loading" role="status">
+          <Spinner size={26} />
+          <span className="muted">Loading the sequences of this dataset…</span>
+        </div>
+      )}
       {data && data.items.length === 0 && <p className="muted">No sequence matches this search.</p>}
       <ul className="browser-list">
         {data?.items.map((item) => (
